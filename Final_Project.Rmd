@@ -1,0 +1,139 @@
+---
+title: "Final Project"
+author: "Tanner Gildea"
+date: "4/2/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(twitteR)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(ggthemes)
+```
+
+```{r download}
+
+# Access keys from developer app. 
+consumer_key <- "JiBgIY3c2oSYaluzC9901ZpGH"
+consumer_secret <- "T0cbKHAWJe6NW3e24F8KvvFeV6lv54aeNmavAGFyL9qHVFm7tL"
+access_token <- "1091061777935355905-pd7WDjnoiOSxcEKMgxyucfOLHtOhk4"
+access_secret <- "nLgDpWG4FhhbAvTGLeEET1nXkAkbVmMw08uZEmin54sRS"
+
+# This section will actually conduct the download.
+
+setup_twitter_oauth(
+    consumer_key, consumer_secret, access_token, access_secret)
+
+harris <- userTimeline("KamalaHarris", n = 3200, includeRts=T)
+sanders <- userTimeline("BernieSanders", n = 3200, includeRts=T)
+booker <- userTimeline("CoryBooker", n = 3200, includeRts=T)
+buttigieg <- userTimeline("PeteButtigieg", n = 3200, includeRts=T)
+castro <- userTimeline("JulianCastro", n = 3200, includeRts=T)
+beto <- userTimeline("BetoORourke", n = 3200, includeRts=T)
+warren <- userTimeline("ewarren", n = 3200, includeRts=T)
+klobuchar <- userTimeline("amyklobuchar", n = 3200, includeRts=T)
+inslee <- userTimeline("JayInslee", n = 3200, includeRts=T)
+hickenlooper <- userTimeline("hickenlooper", n = 3200, includeRts=T)
+gillibrand <- userTimeline("SenGillibrand", n = 3200, includeRts=T)
+
+```
+
+```{r clean}
+
+# To change from a list into a dataframe.
+df.harris <- twListToDF(harris)
+df.sanders <- twListToDF(sanders)
+df.booker <- twListToDF(booker)
+df.buttigieg <- twListToDF(buttigieg)
+df.castro <- twListToDF(castro)
+df.beto <- twListToDF(beto)
+df.warren <- twListToDF(warren)
+df.klobuchar <- twListToDF(klobuchar)
+df.inslee <- twListToDF(inslee)
+df.hickenlooper <- twListToDF(hickenlooper)
+df.gillibrand <- twListToDF(gillibrand)
+
+
+# This will select only the metrics we care about in 2019, in addition to ignoring retweets.
+tweets <- bind_rows(
+  df.harris %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+
+df.sanders %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+  
+df.buttigieg %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+  
+df.castro %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+  
+df.beto %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+  
+df.warren %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+
+df.klobuchar %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+
+df.inslee %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+
+df.hickenlooper %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+  
+df.gillibrand %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019))
+```
+# The Data
+
+My plan is to conduct a number of analyses (text sentiment, basic stats, etc) on the Twitter data of current 2020 Democratic primary challengers. To make the project more managable, I will limit my timeline to start at the beginning of 2019.
+
+I created a developer account on Twitter and was able to access its API. Using the twitteR package, I am able to download the text of the tweets from each candidate's personal account, in addition to other data such as their favorite and retweet activity. The data is relatively clean and tidy as is, although I filtered to remove retweets and some other information. In the future, I may include lat/long data to analyze other geographic trends, or see who they interact with the most on Twitter.
+
+Here is the instructive guide I referenced for accessing, downloading, and manipulating the Twitter data using the twitteR package: https://medium.com/the-artificial-impostor/analyzing-tweets-with-r-92ff2ef990c6
+
+# First Visualization
+
+A first visualization is each candidate's tweet activity over time.
+
+```{r}
+ggplot(tweets, aes(x = created, fill = screenName)) +
+  geom_histogram(
+    position = "identity", bins = 50, show.legend = FALSE) +
+  facet_wrap(~ screenName, nrow = 2) +
+  
+  labs(title = "2020 Democratic Challengers' Tweet Activity",
+       subtitle = "Frequency of Tweets in 2019",
+       caption = "Source: Twitter") +
+  xlab("Date") +
+  ylab("Frequency") +
+  theme_fivethirtyeight()
+  
+```
+
