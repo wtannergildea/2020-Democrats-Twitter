@@ -15,6 +15,7 @@ library(lubridate)
 library(ggthemes)
 library(shiny)
 library(shinythemes)
+library(tidytext)
 ```
 
 ```{r download}
@@ -60,16 +61,24 @@ df.inslee <- twListToDF(inslee)
 df.hickenlooper <- twListToDF(hickenlooper)
 df.gillibrand <- twListToDF(gillibrand)
 df.biden <- twListToDF(biden)
+```
 
+```{r}
 
 # This will select only the metrics we care about in 2019, in addition to ignoring retweets.
+
 tweets <- bind_rows(
   df.harris %>% filter(isRetweet==F) %>%
-    select(
+  select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019),
 
 df.sanders %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+
+df.booker %>% filter(isRetweet==F) %>%
     select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019),
@@ -119,6 +128,10 @@ df.biden %>% filter(isRetweet==F) %>%
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019))
 ```
+
+```{r}
+
+```
 # The Data
 
 My plan is to conduct a number of analyses (text sentiment, basic stats, etc) on the Twitter data of current 2020 Democratic primary challengers. To make the project more managable, I will limit my timeline to start at the beginning of 2019.
@@ -127,11 +140,15 @@ I created a developer account on Twitter and was able to access its API. Using t
 
 Here is the instructive guide I referenced for accessing, downloading, and manipulating the Twitter data using the twitteR package: https://medium.com/the-artificial-impostor/analyzing-tweets-with-r-92ff2ef990c6
 
-# First Visualization
+# Summary Stats
 
-A first visualization is each candidate's tweet activity over time.
+A first visualization is each candidate's tweet activity over time. Specifically, I visualize tweet frequency
+since January. I also want to create a table of summary stats for each candidate, including total number of tweets, average length of tweets in characters, average number of favorites, and average number of retweets.
 
 ```{r}
+
+# Visualization
+
 ggplot(tweets, aes(x = created, fill = screenName)) +
   geom_histogram(
     position = "identity", bins = 50, show.legend = FALSE) +
@@ -143,6 +160,51 @@ ggplot(tweets, aes(x = created, fill = screenName)) +
   xlab("Date") +
   ylab("Frequency") +
   theme_fivethirtyeight()
-  
 ```
 
+```{r}
+# SUMMARY STATS
+
+# Total number of tweets since January  1, 2019.
+
+tweet_count <- tweets %>% 
+  group_by(screenName) %>% 
+  count()
+
+# Average length of tweets in characters
+mean_tweet_length <- tweets %>% 
+  group_by(screenName) %>% 
+  select(screenName, text) %>% 
+  mutate(tweet_length = str_length(text)) %>% 
+  summarize(mean_tweet_length = mean(tweet_length))
+
+# Average number of favorites per tweet
+
+fav_average <- tweets %>% 
+  group_by(screenName) %>% 
+  select(screenName, favoriteCount) %>% 
+  summarize(fav_average = mean(favoriteCount))
+
+# Average number of retweets per tweet
+
+retweet_average <- tweets %>% 
+  group_by(screenName) %>% 
+  select(screenName, retweetCount) %>% 
+  summarize(rt_average = mean(retweetCount))
+```
+
+I also want to create a tab that looks at specific word frequencies, with a search box and a bar chart with each candidate's total.
+
+```{r frequencies}
+
+# Word Use Frequency Table
+
+word_frequency <- tweets %>% 
+  group_by(screenName) %>% 
+  unnest_tokens(word, text) %>% 
+  count(word) 
+  
+
+
+
+```
