@@ -203,8 +203,45 @@ word_frequency <- tweets %>%
   group_by(screenName) %>% 
   unnest_tokens(word, text) %>% 
   count(word) 
-  
+
+# make table
+```
+
+I would like a drop down menu with candidate names, and if selected, a wordcloud of their most frequently used words.
+```{r}
 
 
+```
 
+I also want a drop down menu of key issue words, and once selected, a visualization of how each candidate has used that word. 
+```{r}
+
+```
+
+
+# Sentiment Analysis
+
+One tab will be dedicated to sentiment analysis. Again, this will be used to differentiate candidates based on positivity, negativity, and possibly other factors.
+
+```{r}
+# bing and nrc lexicons are two different baskets of words for positivity/negativity 
+bing_tweets <- tweets %>%
+  unnest_tokens(word, text) %>%
+  inner_join(get_sentiments("bing")) %>%
+  group_by(screenName, sentiment) %>%
+  tally() 
+
+nrc_tweets <- tweets %>%
+  unnest_tokens(word, text) %>%
+  inner_join(get_sentiments("nrc")) %>%
+  filter(sentiment == "positive" | sentiment == "negative") %>%
+  group_by(screenName, sentiment) %>%
+  tally() 
+
+# you can also apply a numeric value to each word's positivity with the afinn lexicon
+afinn_tweets <- tweets %>%
+  unnest_tokens(word, text) %>%
+  inner_join(get_sentiments("afinn")) %>%
+  group_by(screenName) %>%
+  summarize(average_positivity = mean(score))
 ```
