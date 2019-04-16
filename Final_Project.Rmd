@@ -13,6 +13,8 @@ library(ggplot2)
 library(tidyverse)
 library(lubridate)
 library(ggthemes)
+library(shiny)
+library(shinythemes)
 ```
 
 ```{r download}
@@ -28,17 +30,18 @@ access_secret <- "nLgDpWG4FhhbAvTGLeEET1nXkAkbVmMw08uZEmin54sRS"
 setup_twitter_oauth(
     consumer_key, consumer_secret, access_token, access_secret)
 
-harris <- userTimeline("KamalaHarris", n = 3200, includeRts=T)
-sanders <- userTimeline("BernieSanders", n = 3200, includeRts=T)
-booker <- userTimeline("CoryBooker", n = 3200, includeRts=T)
-buttigieg <- userTimeline("PeteButtigieg", n = 3200, includeRts=T)
-castro <- userTimeline("JulianCastro", n = 3200, includeRts=T)
-beto <- userTimeline("BetoORourke", n = 3200, includeRts=T)
-warren <- userTimeline("ewarren", n = 3200, includeRts=T)
-klobuchar <- userTimeline("amyklobuchar", n = 3200, includeRts=T)
-inslee <- userTimeline("JayInslee", n = 3200, includeRts=T)
-hickenlooper <- userTimeline("hickenlooper", n = 3200, includeRts=T)
-gillibrand <- userTimeline("SenGillibrand", n = 3200, includeRts=T)
+harris <- userTimeline("KamalaHarris", n = 3200, includeRts=F)
+sanders <- userTimeline("BernieSanders", n = 3200, includeRts=F)
+booker <- userTimeline("CoryBooker", n = 3200, includeRts=F)
+buttigieg <- userTimeline("PeteButtigieg", n = 3200, includeRts=F)
+castro <- userTimeline("JulianCastro", n = 3200, includeRts=F)
+beto <- userTimeline("BetoORourke", n = 3200, includeRts=F)
+warren <- userTimeline("ewarren", n = 3200, includeRts=F)
+klobuchar <- userTimeline("amyklobuchar", n = 3200, includeRts=F)
+inslee <- userTimeline("JayInslee", n = 3200, includeRts=F)
+hickenlooper <- userTimeline("hickenlooper", n = 3200, includeRts=F)
+gillibrand <- userTimeline("SenGillibrand", n = 3200, includeRts=F)
+biden <- userTimeline("JoeBiden", n = 3200, includeRts=F)
 
 ```
 
@@ -56,6 +59,7 @@ df.klobuchar <- twListToDF(klobuchar)
 df.inslee <- twListToDF(inslee)
 df.hickenlooper <- twListToDF(hickenlooper)
 df.gillibrand <- twListToDF(gillibrand)
+df.biden <- twListToDF(biden)
 
 
 # This will select only the metrics we care about in 2019, in addition to ignoring retweets.
@@ -106,6 +110,11 @@ df.hickenlooper %>% filter(isRetweet==F) %>%
   filter(year(created) == 2019),
   
 df.gillibrand %>% filter(isRetweet==F) %>%
+    select(
+      text, screenName, created, retweetCount, favoriteCount) %>% 
+  filter(year(created) == 2019),
+
+df.biden %>% filter(isRetweet==F) %>%
     select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019))
