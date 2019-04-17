@@ -200,8 +200,9 @@ I also want to create a tab that looks at specific word frequencies, with a sear
 # Word Use Frequency Table
 
 word_frequency <- tweets %>% 
-  group_by(screenName) %>% 
   unnest_tokens(word, text) %>% 
+  filter(word != "https" & word != "t.co") %>% 
+  group_by(screenName) %>% 
   count(word) 
 
 # make table
@@ -224,6 +225,7 @@ I also want a drop down menu of key issue words, and once selected, a visualizat
 One tab will be dedicated to sentiment analysis. Again, this will be used to differentiate candidates based on positivity, negativity, and possibly other factors.
 
 ```{r}
+
 # bing and nrc lexicons are two different baskets of words for positivity/negativity 
 bing_tweets <- tweets %>%
   unnest_tokens(word, text) %>%
