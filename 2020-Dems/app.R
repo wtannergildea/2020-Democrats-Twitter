@@ -8,6 +8,15 @@
 #
 
 library(shiny)
+library(twitteR)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(lubridate)
+library(ggthemes)
+library(shinythemes)
+library(tidytext)
+library(plotly)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -35,13 +44,18 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
    
-   output$distPlot <- renderPlot({
-      # generate bins based on input$bins from ui.R
-      x    <- faithful[, 2] 
-      bins <- seq(min(x), max(x), length.out = input$bins + 1)
-      
-      # draw the histogram with the specified number of bins
-      hist(x, breaks = bins, col = 'darkgray', border = 'white')
+   output$distPlot <- renderPlotly({
+     ggplot(tweets, aes(x = created, fill = screenName)) +
+       geom_histogram(
+         position = "identity", bins = 50, show.legend = FALSE) +
+       facet_wrap(~ screenName, nrow = 2) +
+       
+       labs(title = "2020 Democratic Challengers' Tweet Activity",
+            subtitle = "Frequency of Tweets in 2019",
+            caption = "Source: Twitter") +
+       xlab("Date") +
+       ylab("Frequency") +
+       theme_fivethirtyeight()
    })
 }
 

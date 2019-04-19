@@ -16,6 +16,7 @@ library(ggthemes)
 library(shiny)
 library(shinythemes)
 library(tidytext)
+library(politeness)
 ```
 
 ```{r download}
@@ -71,7 +72,11 @@ tweets <- bind_rows(
   df.harris %>% filter(isRetweet==F) %>%
   select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
-  filter(year(created) == 2019),
+  filter(year(created) == 2019) %>% 
+    
+# For politeness test
+  
+    mutate(condition = 0),
 
 df.sanders %>% filter(isRetweet==F) %>%
     select(
@@ -86,7 +91,11 @@ df.booker %>% filter(isRetweet==F) %>%
 df.buttigieg %>% filter(isRetweet==F) %>%
     select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
-  filter(year(created) == 2019),
+  filter(year(created) == 2019) %>% 
+  
+# For politeness test
+  
+  mutate(condition = 1),
   
 df.castro %>% filter(isRetweet==F) %>%
     select(
@@ -127,6 +136,8 @@ df.biden %>% filter(isRetweet==F) %>%
     select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019))
+
+write_rds(tweets, "2020-Dems/tweets")
 ```
 
 ```{r}
@@ -149,7 +160,7 @@ since January. I also want to create a table of summary stats for each candidate
 
 # Visualization
 
-ggplot(tweets, aes(x = created, fill = screenName)) +
+activity_hist <- ggplot(tweets, aes(x = created, fill = screenName)) +
   geom_histogram(
     position = "identity", bins = 50, show.legend = FALSE) +
   facet_wrap(~ screenName, nrow = 2) +
@@ -185,6 +196,8 @@ fav_average <- tweets %>%
   select(screenName, favoriteCount) %>% 
   summarize(fav_average = mean(favoriteCount))
 
+write_rds(fav_average, "2020-Dems/fav_average")
+
 # Average number of retweets per tweet
 
 retweet_average <- tweets %>% 
@@ -201,8 +214,8 @@ I also want to create a tab that looks at specific word frequencies, with a sear
 
 word_frequency <- tweets %>% 
   unnest_tokens(word, text) %>% 
-  filter(word != "https" & word != "t.co") %>% 
-  group_by(screenName) %>% 
+  filter(word != "https" & word != "t.co" & word != "amp") %>% 
+  # group_by(screenName) %>% 
   count(word) 
 
 # make table
@@ -215,6 +228,8 @@ I would like a drop down menu with candidate names, and if selected, a wordcloud
 ```
 
 I also want a drop down menu of key issue words, and once selected, a visualization of how each candidate has used that word. 
+
+List of keywords: climate, health, healthcare, trump, iowa, gun, abortion, religion, rich, poor, war, justice, hope, change
 ```{r}
 
 ```
@@ -246,4 +261,23 @@ afinn_tweets <- tweets %>%
   inner_join(get_sentiments("afinn")) %>%
   group_by(screenName) %>%
   summarize(average_positivity = mean(score))
+```
+
+```{r politeness}
+# I want to try dt's politeness package on the tweets.
+
+# cleaned_t <- tweets %>% 
+#   filter(screenName == "KamalaHarris" | screenName == "PeteButtigieg")  
+#   
+# df_politeness_count <- cleaned_t %>% 
+#   politeness(cleaned_t$text,
+#                                   parser="none",
+#               metric = "count",
+#                                   drop_blank=FALSE,
+#              )
+# 
+# politenessPlot(df_politeness_count,
+#                split=cleaned_t$condition,
+#                split_levels = c("KamalaHarris","PeteButtigieg"),
+#                split_name = "screenName")
 ```
