@@ -18,6 +18,8 @@ library(shinythemes)
 library(tidytext)
 library(plotly)
 
+tweets <- read_rds("tweets")
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
    
@@ -36,7 +38,7 @@ ui <- fluidPage(
       
       # Show a plot of the generated distribution
       mainPanel(
-         plotOutput("distPlot")
+         plotlyOutput("distPlot")
       )
    )
 )
@@ -47,7 +49,7 @@ server <- function(input, output) {
    output$distPlot <- renderPlotly({
      ggplot(tweets, aes(x = created, fill = screenName)) +
        geom_histogram(
-         position = "identity", bins = 50, show.legend = FALSE) +
+         position = "identity", show.legend = FALSE) +
        facet_wrap(~ screenName, nrow = 2) +
        
        labs(title = "2020 Democratic Challengers' Tweet Activity",

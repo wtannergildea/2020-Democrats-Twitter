@@ -5,8 +5,9 @@ account: wtannergildea
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 869915
-bundleId: 2016737
+bundleId: 2023957
 url: https://wtannergildea.shinyapps.io/2020-Dems/
-when: 1555444814.79843
+when: 1555696597.40237
 asMultiple: FALSE
 asStatic: FALSE
+ignoredFiles: fav_average|tweets

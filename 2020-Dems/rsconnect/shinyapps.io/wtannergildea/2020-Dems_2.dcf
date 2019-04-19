@@ -1,0 +1,13 @@
+name: 2020-Dems_2
+title: 2020-Dems_2
+username:
+account: wtannergildea
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 877839
+bundleId: 2023964
+url: https://wtannergildea.shinyapps.io/2020-Dems_2/
+when: 1555696998.35331
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: fav_average
