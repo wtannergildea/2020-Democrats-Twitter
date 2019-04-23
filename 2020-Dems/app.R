@@ -173,7 +173,14 @@ server <- function(input, output) {
             caption = "Source: Twitter") +
        xlab("Date") +
        ylab("Frequency") +
-       theme_fivethirtyeight()
+       
+       theme_fivethirtyeight() +
+  
+    # For connection to the bin sidebar
+       
+       geom_histogram(bins = input$bins) 
+       
+
    })
    
    ####################################
