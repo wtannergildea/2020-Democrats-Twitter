@@ -184,9 +184,9 @@ summary_table <- tweets %>%
   select(screenName, text, favoriteCount, retweetCount) %>% 
   mutate(tweet_count = n()) %>% 
   mutate(tweet_length = str_length(text)) %>%
-  mutate(mean_tweet_length = mean(tweet_length)) %>% 
-  mutate(fav_average = mean(favoriteCount)) %>% 
-  mutate(rt_average = mean(retweetCount)) 
+  mutate(mean_tweet_length = round(mean(tweet_length)), digits = 0) %>% 
+  mutate(fav_average = round(mean(favoriteCount)), digits = 0) %>% 
+  mutate(rt_average = round(mean(retweetCount)), digits = 0) 
 
 clean_summary_table <- summary_table %>% 
   select(screenName, tweet_count, mean_tweet_length, fav_average, rt_average) %>% 

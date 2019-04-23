@@ -10,12 +10,19 @@ library(shinythemes)
 library(tidytext)
 library(plotly)
 library(shinyjs)
+library(DT)
 
 cleaned_tweets <- read_rds("cleaned_tweets")
 afinn_tweets <- read_rds("afinn_tweets")
 nrc_tweets <- read_rds("nrc_tweets")
 bing_tweets <- read_rds("bing_tweets")
-summary_table <- read_rds("clean_summary_table")
+
+summary_table <- read_rds("clean_summary_table") %>% 
+  rename("Handle" = "screenName", 
+         "# of Tweets in 2019" = "tweet_count", 
+         "Average Tweet Length in Characters" = "mean_tweet_length", 
+         "Average Favorites Per Tweet" = "fav_average", 
+         "Average Retweets Per Tweet" = "rt_average") 
   
 
 # Define UI for application that draws a histogram
@@ -60,12 +67,11 @@ tabPanel("Summary Statistics",
            # Application title
            titlePanel("2020 Democratic Presidential Candidates' Twitter Activity"),
            
-
              
              # Show a plot of the generated distribution
              mainPanel(
                #put in the plotlyOutput function here
-               tableOutput("summary_table")
+               DTOutput("summary_table")
                
              )
            )
@@ -175,11 +181,15 @@ server <- function(input, output) {
    
   # Summary table
      
-     output$summary_table <- renderTable({
+     output$summary_table <- renderDT(
        
-       summary_table
+       summary_table,
+       class = 'display', 
+       rownames = FALSE,
+       caption = 'Summary Statistics',
+       options = list(dom = 'ft')
     
-   })
+   )
    
    ####################################
    # TEXT SENTIMENT ANALYSIS PAGE
