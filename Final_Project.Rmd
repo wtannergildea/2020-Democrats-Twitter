@@ -205,6 +205,26 @@ retweet_average <- tweets %>%
   group_by(screenName) %>% 
   select(screenName, retweetCount) %>% 
   summarize(rt_average = mean(retweetCount))
+
+summary_table <- tweets %>% 
+  group_by(screenName) %>% 
+  select(screenName, text, favoriteCount, retweetCount) %>% 
+  mutate(tweet_count = n()) %>% 
+  mutate(tweet_length = str_length(text)) %>%
+  mutate(mean_tweet_length = mean(tweet_length)) %>% 
+  mutate(fav_average = mean(favoriteCount)) %>% 
+  mutate(rt_average = mean(retweetCount))  
+
+clean_summary_table <- summary_table %>% 
+  select(screenName, tweet_count, mean_tweet_length, fav_average, rt_average) %>% 
+
+
+  
+  # summarize("Total" = tweet_count,
+  #           "Average Length" = mean(tweet_length),
+  #           "Average Favorites" = fav_average,
+  #           "Average Retweets" = rt_average)
+  
 ```
 
 I also want to create a tab that looks at specific word frequencies, with a search box and a bar chart with each candidate's total.

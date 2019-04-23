@@ -79,6 +79,7 @@ tabPanel("Summary Statistics",
              # Show a plot of the generated distribution
              mainPanel(
                #put in the plotlyOutput function here
+               tableOutput("summary_table")
                
              )
            )
@@ -160,7 +161,11 @@ tabPanel("Individual Key Words",
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-   
+
+  ####################################
+  # SUMMARY STATS
+  ####################################
+  
   # Tweet frequency histogram
    output$tweet_freq <- renderPlotly({
      ggplot(cleaned_tweets, aes(x = created, fill = screenName)) +
