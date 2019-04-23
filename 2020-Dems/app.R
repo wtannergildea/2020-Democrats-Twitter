@@ -1,11 +1,3 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
 
 library(shiny)
 library(twitteR)
@@ -23,6 +15,8 @@ cleaned_tweets <- read_rds("cleaned_tweets")
 afinn_tweets <- read_rds("afinn_tweets")
 nrc_tweets <- read_rds("nrc_tweets")
 bing_tweets <- read_rds("bing_tweets")
+summary_table <- read_rds("clean_summary_table")
+  
 
 # Define UI for application that draws a histogram
 ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("readable"),
@@ -66,15 +60,7 @@ tabPanel("Summary Statistics",
            # Application title
            titlePanel("2020 Democratic Presidential Candidates' Twitter Activity"),
            
-           # Sidebar with a slider input for number of bins 
-           sidebarLayout(
-             sidebarPanel(
-               sliderInput("bins",
-                           "Number of bins:",
-                           min = 1,
-                           max = 50,
-                           value = 30)
-             ),
+
              
              # Show a plot of the generated distribution
              mainPanel(
@@ -83,7 +69,7 @@ tabPanel("Summary Statistics",
                
              )
            )
-         )),
+         ),
 
 ####################################
 # SENTIMENT ANALYSIS
@@ -184,8 +170,15 @@ server <- function(input, output) {
     # For connection to the bin sidebar
        
        geom_histogram(bins = input$bins) 
+     
+   })
+   
+  # Summary table
+     
+     output$summary_table <- renderTable({
        
-
+       summary_table
+    
    })
    
    ####################################

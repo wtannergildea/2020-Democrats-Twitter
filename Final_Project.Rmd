@@ -177,34 +177,7 @@ activity_hist <- ggplot(tweets, aes(x = created, fill = screenName)) +
 ```{r}
 # SUMMARY STATS
 
-# Total number of tweets since January  1, 2019.
-
-tweet_count <- tweets %>% 
-  group_by(screenName) %>% 
-  count()
-
-# Average length of tweets in characters
-mean_tweet_length <- tweets %>% 
-  group_by(screenName) %>% 
-  select(screenName, text) %>% 
-  mutate(tweet_length = str_length(text)) %>% 
-  summarize(mean_tweet_length = mean(tweet_length))
-
-# Average number of favorites per tweet
-
-fav_average <- tweets %>% 
-  group_by(screenName) %>% 
-  select(screenName, favoriteCount) %>% 
-  summarize(fav_average = mean(favoriteCount))
-
-write_rds(fav_average, "2020-Dems/fav_average")
-
-# Average number of retweets per tweet
-
-retweet_average <- tweets %>% 
-  group_by(screenName) %>% 
-  select(screenName, retweetCount) %>% 
-  summarize(rt_average = mean(retweetCount))
+# summary table of mean tweet count, favs, retweets, lengths, etc
 
 summary_table <- tweets %>% 
   group_by(screenName) %>% 
@@ -213,17 +186,14 @@ summary_table <- tweets %>%
   mutate(tweet_length = str_length(text)) %>%
   mutate(mean_tweet_length = mean(tweet_length)) %>% 
   mutate(fav_average = mean(favoriteCount)) %>% 
-  mutate(rt_average = mean(retweetCount))  
+  mutate(rt_average = mean(retweetCount)) 
 
 clean_summary_table <- summary_table %>% 
   select(screenName, tweet_count, mean_tweet_length, fav_average, rt_average) %>% 
+  distinct()
 
+write_rds(clean_summary_table, "2020-Dems/clean_summary_table")
 
-  
-  # summarize("Total" = tweet_count,
-  #           "Average Length" = mean(tweet_length),
-  #           "Average Favorites" = fav_average,
-  #           "Average Retweets" = rt_average)
   
 ```
 
