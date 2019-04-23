@@ -39,22 +39,12 @@ ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("readable"),
    # Application title
    titlePanel("2020 Democratic Presidential Candidates' Twitter Activity"),
    
-   # Sidebar with a slider input for number of bins 
-   sidebarLayout(
-      sidebarPanel(
-         sliderInput("bins",
-                     "Number of bins:",
-                     min = 1,
-                     max = 50,
-                     value = 30)
-      ),
-      
       # Show a plot of the generated distribution
       mainPanel(
-         plotlyOutput("tweet_freq")
+        # insert here eventually
       )
    )
-)),
+),
 
 ####################################
 # SUMMARY STATS
@@ -64,18 +54,35 @@ tabPanel("Summary Statistics",
          
          fluidPage(
            
-           # Application title
-           titlePanel("2020 Democratic Presidential Candidates' Twitter Activity"),
+         # Application title
+           titlePanel("Summary of Twitter Activity"),
            
-             
-             # Show a plot of the generated distribution
-             mainPanel(
-               #put in the plotlyOutput function here
-               DTOutput("summary_table")
-               
-             )
-           )
-         ),
+           sidebarLayout(
+             sidebarPanel(
+               sliderInput("bins",
+                           "Number of bins:",
+                           min = 1,
+                           max = 50,
+                           value = 30)),
+                 
+              # Show a plot of the generated distribution
+              mainPanel(
+                
+                "Here you can see the candidates' Twitter activity since the beginning of 2019.",
+                
+                plotlyOutput("tweet_freq"),
+                
+                br(),
+                br(),
+                br(),
+                
+                p(paste("The table below presents a summary of each candidates' Twitter activity, 
+                including their total number of tweets, the average length of their tweets, 
+                and the average number of favorites and retweets each tweet receives.")),
+                
+                DTOutput("summary_table")
+
+         )))),
 
 ####################################
 # SENTIMENT ANALYSIS
@@ -186,8 +193,7 @@ server <- function(input, output) {
        summary_table,
        class = 'display', 
        rownames = FALSE,
-       caption = 'Summary Statistics',
-       options = list(dom = 'ft')
+       options = list(dom = 't')
     
    )
    
