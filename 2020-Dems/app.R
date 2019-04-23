@@ -17,6 +17,7 @@ library(ggthemes)
 library(shinythemes)
 library(tidytext)
 library(plotly)
+library(shinyjs)
 
 cleaned_tweets <- read_rds("cleaned_tweets")
 afinn_tweets <- read_rds("afinn_tweets")
@@ -24,9 +25,11 @@ nrc_tweets <- read_rds("nrc_tweets")
 bing_tweets <- read_rds("bing_tweets")
 
 # Define UI for application that draws a histogram
-ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("darkly"),
-            
+ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("readable"),
+                 
+####################################                 
 # HOME PAGE 
+####################################
 
   tabPanel("Home",
   
@@ -52,7 +55,9 @@ ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("darkly"),
    )
 )),
 
-# TAB TWO
+####################################
+# SUMMARY STATS
+####################################
 
 tabPanel("Summary Statistics",
          
@@ -79,6 +84,10 @@ tabPanel("Summary Statistics",
            )
          )),
 
+####################################
+# SENTIMENT ANALYSIS
+####################################
+
 tabPanel("Sentiment Analysis",
          
          fluidPage(
@@ -88,33 +97,32 @@ tabPanel("Sentiment Analysis",
            
            # Sidebar with a slider input for number of bins 
            sidebarLayout(
-             sidebarPanel(
-               sliderInput("bins",
-                           "Number of bins:",
-                           min = 1,
-                           max = 50,
-                           value = 30)
+          
+          # Allows the user to toggle between types of lexicons.
+             
+               sidebarPanel(
+                 selectInput("tweet_sentiments", "Choose Sentiment:", 
+                             c("Average Positivity: Afinn",
+                               "Positivity and Negativity: Bing",
+                               "Positivity and Negativity: NRC"),
+                             "Average Positivity: Afinn") # sets default
              ),
              
              # Show a plot of the generated distribution
              mainPanel(
                #put in the plotlyOutput function here
                
-               plotlyOutput("tweet_sentiments_afinn"),
-               
-               br(),
-               
-               plotlyOutput("tweet_sentiments_nrc"),
-               
-               br(),
-               
-               plotlyOutput("tweet_sentiments_bing")
+               plotlyOutput("tweet_sentiments")
                
                # text description of the visualization above
                
              )
            )
          )),
+
+####################################
+# KEY WORDS
+####################################
 
 tabPanel("Individual Key Words",
          
@@ -168,12 +176,18 @@ server <- function(input, output) {
        theme_fivethirtyeight()
    })
    
-   
+   ####################################
    # TEXT SENTIMENT ANALYSIS PAGE
+   ####################################
    
-   # AFINN OUTPUT
-   output$tweet_sentiments_afinn <- renderPlotly({
+   
+
+   output$tweet_sentiments <- renderPlotly({
+
+     # AFINN OUTPUT
      
+     if (input$tweet_sentiments == "Average Positivity: Afinn") {
+       
      ggplot(afinn_tweets, aes(x = screenName, y = average_positivity, fill = screenName)) +
               geom_bar(stat = "identity") +
        labs(title = "Average Positivity of Tweets",
@@ -182,10 +196,12 @@ server <- function(input, output) {
        theme(axis.title.x=element_blank(),
              axis.text.x=element_blank(),
              axis.ticks.x=element_blank())
-  })
-   # NRC OUTPUT
-   output$tweet_sentiments_nrc <- renderPlotly({
+     }
      
+     else if (input$tweet_sentiments == "Positivity and Negativity: NRC") {
+
+   # NRC OUTPUT
+    
      ggplot(nrc_tweets, aes(x = screenName, y = n, fill = sentiment)) +
        geom_bar(stat = "identity") +
        labs(title = "Number of Positive and Negative Tweets",
@@ -194,11 +210,12 @@ server <- function(input, output) {
        theme(axis.title.x=element_blank(),
              axis.text.x=element_blank(),
              axis.ticks.x=element_blank())
-   })
-   
-   # BING OUTPUT
-   output$tweet_sentiments_bing <- renderPlotly({
+     }
      
+     else if (input$tweet_sentiments == "Positivity and Negativity: Bing") {
+       
+   # BING OUTPUT
+
      ggplot(bing_tweets, aes(x = screenName, y = n, fill = sentiment)) +
        geom_bar(stat = "identity") +
        labs(title = "Number of Positive and Negative Tweets",
@@ -207,7 +224,8 @@ server <- function(input, output) {
        theme(axis.title.x=element_blank(),
              axis.text.x=element_blank(),
              axis.ticks.x=element_blank())
-   })
+    }
+  })
 }
 
 # Run the application 
