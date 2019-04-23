@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(twitteR)
 library(dplyr)
 library(ggplot2)
@@ -16,7 +16,7 @@ library(ggthemes)
 library(shiny)
 library(shinythemes)
 library(tidytext)
-library(politeness)
+# library(politeness)
 ```
 
 ```{r download}
@@ -72,11 +72,11 @@ tweets <- bind_rows(
   df.harris %>% filter(isRetweet==F) %>%
   select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
-  filter(year(created) == 2019) %>% 
+  filter(year(created) == 2019),
     
 # For politeness test
   
-    mutate(condition = 0),
+    # mutate(condition = 0),
 
 df.sanders %>% filter(isRetweet==F) %>%
     select(
@@ -91,11 +91,11 @@ df.booker %>% filter(isRetweet==F) %>%
 df.buttigieg %>% filter(isRetweet==F) %>%
     select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
-  filter(year(created) == 2019) %>% 
+  filter(year(created) == 2019),  
   
 # For politeness test
   
-  mutate(condition = 1),
+  # mutate(condition = 1),
   
 df.castro %>% filter(isRetweet==F) %>%
     select(
@@ -137,7 +137,8 @@ df.biden %>% filter(isRetweet==F) %>%
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019))
 
-write_rds(tweets, "2020-Dems/tweets")
+write_rds(tweets, "2020-Dems/cleaned_tweets")
+
 ```
 
 ```{r}
@@ -158,7 +159,7 @@ since January. I also want to create a table of summary stats for each candidate
 
 ```{r}
 
-# Visualization
+# Visualization of tweet activity 
 
 activity_hist <- ggplot(tweets, aes(x = created, fill = screenName)) +
   geom_histogram(
@@ -229,7 +230,7 @@ I would like a drop down menu with candidate names, and if selected, a wordcloud
 
 I also want a drop down menu of key issue words, and once selected, a visualization of how each candidate has used that word. 
 
-List of keywords: climate, health, healthcare, trump, iowa, gun, abortion, religion, rich, poor, war, justice, hope, change
+List of keywords: climate, health, healthcare, trump, iowa, gun, abortion, religion, rich, poor, war, justice, hope, change, others?
 ```{r}
 
 ```
@@ -248,6 +249,8 @@ bing_tweets <- tweets %>%
   group_by(screenName, sentiment) %>%
   tally() 
 
+write_rds(bing_tweets, "2020-Dems/bing_tweets")
+
 nrc_tweets <- tweets %>%
   unnest_tokens(word, text) %>%
   inner_join(get_sentiments("nrc")) %>%
@@ -255,12 +258,16 @@ nrc_tweets <- tweets %>%
   group_by(screenName, sentiment) %>%
   tally() 
 
+write_rds(nrc_tweets, "2020-Dems/nrc_tweets")
+
 # you can also apply a numeric value to each word's positivity with the afinn lexicon
 afinn_tweets <- tweets %>%
   unnest_tokens(word, text) %>%
   inner_join(get_sentiments("afinn")) %>%
   group_by(screenName) %>%
   summarize(average_positivity = mean(score))
+
+write_rds(afinn_tweets, "2020-Dems/afinn_tweets")
 ```
 
 ```{r politeness}
