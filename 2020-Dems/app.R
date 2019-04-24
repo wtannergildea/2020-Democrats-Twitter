@@ -1,4 +1,3 @@
-
 library(shiny)
 library(twitteR)
 library(ggplot2)
@@ -9,6 +8,10 @@ library(shinythemes)
 library(tidytext)
 library(plotly)
 library(DT)
+
+####################################                 
+# LOAD DATA
+####################################
 
 cleaned_tweets <- read_rds("cleaned_tweets")
 afinn_tweets <- read_rds("afinn_tweets")
@@ -22,10 +25,13 @@ summary_table <- read_rds("clean_summary_table") %>%
          "Average Tweet Length in Characters" = "mean_tweet_length", 
          "Average Favorites Per Tweet" = "fav_average", 
          "Average Retweets Per Tweet" = "rt_average") 
-  
+
+####################################                 
+# USER INTERFACE
+####################################
 
 # Define UI for application that draws a histogram
-ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("readable"),
+ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("flatly"),
                  
 ####################################                 
 # HOME PAGE 
@@ -61,13 +67,7 @@ ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("readable"),
    br(),
    
    p(paste("Using Twitter's API, I tried to answer these questions. For my analysis, I picked twelve of the most popular
-           candidates, both in terms of polling and fundraising. Hope you enjoy the results!")),
-
-   
-      # Show a plot of the generated distribution
-      mainPanel(
-        # insert here eventually
-      )
+           candidates, both in terms of polling and fundraising. Hope you enjoy the results!"))
    )
 ),
 
@@ -86,20 +86,27 @@ tabPanel("Summary Statistics",
              sidebarPanel(
                sliderInput("bins",
                            "# of Bins:",
-                           min = 25,
+                           min = 10,
                            max = 50,
                            value = 30), 
                width = 2),
+             
+             # checkboxInput("candidate",
+             #                    "KamalaHarris",
+             #               value = TRUE),
                
                  
               # Show a plot of the generated distribution
               mainPanel(
                 
-                "Here you can see the candidates' Twitter activity since the beginning of 2019.",
+                "Not all candidates have taken to Twitter with the same frequency as others.
+                Here you can see the candidates' Twitter activity since the beginning of 2019, as visualized
+                by the volume of their tweets over time.",
                 
                 br(),
+                br(),
                 
-                plotlyOutput("tweet_freq"),
+                plotOutput("tweet_freq"),
                 
                 br(),
                 br(),
@@ -109,7 +116,16 @@ tabPanel("Summary Statistics",
                 including their total number of tweets, the average length of their tweets, 
                 and the average number of favorites and retweets each tweet receives.")),
                 
-                DTOutput("summary_table")
+                br(),
+                
+                p(paste("Feel free to order by a particular column by clicking on the corresponding header.")),
+                
+                br(),
+                
+                DTOutput("summary_table"),
+                
+                br(),
+                br()
 
          )))),
 
@@ -215,34 +231,44 @@ tabPanel("Footnotes",
            mainPanel(
              # insert here eventually
            )
-         )
-)
+         )))
 
-)
-
-
-
+###################################
+# SERVER
+###################################
 
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-  ####################################
+  ###################################
   # SUMMARY STATS
-  ####################################
+  ###################################
   
   # Tweet frequency histogram
-   output$tweet_freq <- renderPlotly({
-     ggplot(cleaned_tweets, aes(x = created, fill = screenName)) +
+   output$tweet_freq <- renderPlot({
+     
+     cleaned_tweets %>% 
+       
+     # filter(screenName == input$candidate) %>% 
+       
+     ggplot(aes(x = created, fill = screenName)) +
+       
        geom_histogram(
          position = "identity", show.legend = FALSE) +
+       
        facet_wrap(~ screenName, nrow = 2) +
        
-       labs(title = "2020 Democratic Challengers' Tweet Activity",
+       labs(title = "2020 Democratic Challengers' Twitter Activity",
             subtitle = "Frequency of Tweets in 2019",
             caption = "Source: Twitter") +
+       
        xlab("Date") +
        ylab("Frequency") +
+       
+       guides(fill = FALSE) +
+       
+    # Selected theme
        
        theme_fivethirtyeight() +
   
