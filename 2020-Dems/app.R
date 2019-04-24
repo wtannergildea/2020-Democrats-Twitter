@@ -44,30 +44,34 @@ ui <- navbarPage("2020 Dems on Twitter", theme = shinytheme("flatly"),
    # Application title
    titlePanel("The Story of the 2020 Democratic Primary, as Told Through Twitter"),
    
-   p(paste("A record number of Democrats are seeking their party's nomination for the Presidency in 
-           2020. Presumptive front-runners Joe Biden and Bernie Sanders aren't scaring away the competition: the 
-           field includes  former and sitting U.S. senators, representatives, governors, 
-           a mayor, cabinet secretaries, an author, and a tech executive.")),
+   p(paste("A record number of Democrats are seeking their party's nomination for the Presidency
+          in 2020. Presumptive front-runners Joe Biden and Bernie Sanders aren't scaring away the
+          competition: the field includes  former and sitting U.S. senators, representatives, 
+          governors, a mayor, cabinet secretaries, an author, and a tech executive.")),
    
    br(),
    
-   p(paste("The success of any presidential campaign hinges on the candidate's ability to connect with voters 
-            on the ground, especially in the early primary and caucus states of Iowa, New Hampshire, South Carolina, and Nevada.")),
+   p(paste("The success of any presidential campaign hinges on the candidate's ability to connect
+          with voters on the ground, especially in the early primary and caucus states of Iowa, 
+           New Hampshire, South Carolina, and Nevada.")),
    
    br(),
    
-   p(paste("As proven by the current President, however, campaigns are also waged online - especially on Twitter.
-           According, the 2020 Democratic primary candidates have all taken to the platform to spread their message.")),
+   p(paste("As proven by the current President, however, campaigns are also waged online - 
+          especially on Twitter. According, the 2020 Democratic primary candidates have all 
+           taken to the platform to spread their message.")),
    
    br(),
    
-   p(paste("But how has each candidate used Twitter? How frequently do they tweet? How are their tweets received?
-            What language do they use, what's the tone of their writing, and what issues are they talking about most?")),
+   p(paste("But how has each candidate used Twitter? How frequently do they tweet? How are their 
+          tweets received? What language do they use, what's the tone of their writing, and 
+           what issues are they talking about most?")),
    
    br(),
    
-   p(paste("Using Twitter's API, I tried to answer these questions. For my analysis, I picked twelve of the most popular
-           candidates, both in terms of polling and fundraising. Hope you enjoy the results!"))
+   p(paste("Using Twitter's API, I tried to answer these questions. For my analysis, I picked 
+            twelve of the most popular candidates, both in terms of polling and fundraising. 
+           Hope you enjoy the results!"))
    )
 ),
 
@@ -143,7 +147,7 @@ tabPanel("Sentiment Analysis",
            # Sidebar with a slider input for number of bins 
            # sidebarLayout(
           
-          # Allows the user to toggle between types of lexicons.
+          # If this works, would allows the user to toggle between types of lexicons. May not be necessary.
              
              #   sidebarPanel(
              #     selectInput("tweet_sentiments", "Choose Sentiment:",
@@ -157,12 +161,41 @@ tabPanel("Sentiment Analysis",
              # mainPanel(
                #put in the plotlyOutput function here
                
+               p(paste("Using a methodology called Sentiment Analysis, we are able to get a better
+               sense of the tone of each candidate. This is done by checking each candidate's tweets
+               for specific baskets of words, or lexicons. Depending on the lexicon, we can measure
+               the sentiments of a candidate's language, such their positivity, negativity, or even politeness.")),
+          
+               br(),
+              
+               p(paste("In sentiment analysis using R, there are three main lexicons: AFINN, NRC, and BING.
+                       The AFINN lexicon assigns a positivity rating to the text by aggregating the scores of
+                       individual words, which range from -5 (most negative) to +5 (most positive). What outliers
+                       do you notice among the candidates?")),
+          
+               br(),
+          
                plotlyOutput("afinn"),
                
+               br(),
+               br(),
+               br(),
+               br(),
+          
+              p(paste("The NRC lexicon is interesting because it assigns a specific emotion to each word, in addition
+                      to an overall binary value of either positive or negative. These emotions include
+                      anger, anticipation, disgust, fear, joy, sadness, surprise, and trust.")),
+          
                br(),
                
                plotlyOutput("nrc"),
                
+               br(),
+          
+              p(paste("The final standard lexicon, BING, is similar to the NRC method but does not include
+              emotions. It focuses simply on applying a binary value of either positive or negative to each
+                      word.")),
+          
                br(),
                
                plotlyOutput("bing")
@@ -301,9 +334,9 @@ server <- function(input, output) {
      
      ggplot(afinn_tweets, aes(x = screenName, y = average_positivity, fill = screenName)) +
               geom_bar(stat = "identity") +
-       labs(title = "Average Positivity of Tweets",
+       labs(title = "Average Positivity of Candidates' Tweets",
             subtitle = "Per Afinn",
-            y = "Average Positivity Rating") +
+            y = "Average AFINN Positivity Rating") +
        theme(axis.title.x=element_blank(),
              axis.text.x=element_blank(),
              axis.ticks.x=element_blank())
@@ -316,7 +349,7 @@ server <- function(input, output) {
       
      ggplot(nrc_tweets, aes(x = screenName, y = n, fill = sentiment)) +
        geom_bar(stat = "identity") +
-       labs(title = "Number of Positive and Negative Tweets",
+       labs(title = "Emotions Conveyed by Candidates' Tweets",
             subtitle = "Per NRC",
             y = "Count") +
        theme(axis.title.x=element_blank(),

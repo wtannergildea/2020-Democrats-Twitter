@@ -248,7 +248,7 @@ write_rds(bing_tweets, "2020-Dems/bing_tweets")
 nrc_tweets <- tweets %>%
   unnest_tokens(word, text) %>%
   inner_join(get_sentiments("nrc")) %>%
-  filter(sentiment == "positive" | sentiment == "negative") %>%
+  filter(sentiment != "positive" & sentiment != "negative") %>%
   group_by(screenName, sentiment) %>%
   tally() 
 
