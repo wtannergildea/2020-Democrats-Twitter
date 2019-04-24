@@ -177,7 +177,7 @@ tabPanel("Individual Key Words",
              # Show a plot of the generated distribution
              mainPanel(
                
-               tableOutput("word_count_table")
+               DTOutput("word_count_table")
              )
            )
          )),
@@ -316,12 +316,12 @@ server <- function(input, output) {
    # KEY WORDS
    ####################################
    
-   output$word_count_table <- renderTable(
+   output$word_count_table <- renderDT(
      
-     word_freq %>% dplyr::filter(Word == input$word)
-     # class = 'display', 
-     # rownames = FALSE,
-     # options = list(dom = 't')
+     word_freq %>% dplyr::filter(Word == input$word),
+     class = 'display',
+     rownames = FALSE,
+     options = list(dom = 't')
      
    )
 
