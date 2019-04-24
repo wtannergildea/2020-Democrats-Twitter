@@ -1,7 +1,6 @@
 
 library(shiny)
 library(twitteR)
-library(dplyr)
 library(ggplot2)
 library(tidyverse)
 library(lubridate)
@@ -9,13 +8,13 @@ library(ggthemes)
 library(shinythemes)
 library(tidytext)
 library(plotly)
-library(shinyjs)
 library(DT)
 
 cleaned_tweets <- read_rds("cleaned_tweets")
 afinn_tweets <- read_rds("afinn_tweets")
 nrc_tweets <- read_rds("nrc_tweets")
 bing_tweets <- read_rds("bing_tweets")
+word_freq <- read_rds("word_frequency")
 
 summary_table <- read_rds("clean_summary_table") %>% 
   rename("Handle" = "screenName", 
@@ -171,18 +170,14 @@ tabPanel("Individual Key Words",
            # Sidebar with a slider input for number of bins 
            sidebarLayout(
              sidebarPanel(
-               sliderInput("bins",
-                           "Number of bins:",
-                           min = 1,
-                           max = 50,
-                           value = 30)
+               
+               textInput("word", "Please enter your keyword.", "word")
              ),
              
              # Show a plot of the generated distribution
              mainPanel(
                
-               
-               
+               tableOutput("word_count_table")
              )
            )
          )),
@@ -316,7 +311,19 @@ server <- function(input, output) {
              axis.text.x=element_blank(),
              axis.ticks.x=element_blank())
     })
+
+   ####################################
+   # KEY WORDS
+   ####################################
    
+   output$word_count_table <- renderTable(
+     
+     word_freq %>% dplyr::filter(Word == input$word)
+     # class = 'display', 
+     # rownames = FALSE,
+     # options = list(dom = 't')
+     
+   )
 
 }
 

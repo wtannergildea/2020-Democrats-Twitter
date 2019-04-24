@@ -205,11 +205,15 @@ I also want to create a tab that looks at specific word frequencies, with a sear
 
 word_frequency <- tweets %>% 
   unnest_tokens(word, text) %>% 
+  group_by(screenName) %>% 
   filter(word != "https" & word != "t.co" & word != "amp") %>% 
-  # group_by(screenName) %>% 
-  count(word) 
+  count(word) %>% 
+  select(screenName, word, n ) %>% 
+  rename("User" = "screenName", "Word" = "word", "Count" = "n")
 
-# make table
+write_rds(word_frequency, "2020-Dems/word_frequency")
+
+# make table in app.R
 ```
 
 I would like a drop down menu with candidate names, and if selected, a wordcloud of their most frequently used words.
