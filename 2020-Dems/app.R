@@ -220,7 +220,7 @@ tabPanel("Individual Key Words",
            sidebarLayout(
              sidebarPanel(
                
-               textInput("word", "Please enter your keyword.", "word")
+               textInput("word", "Please enter your keyword, e.g. healthcare.", "healthcare")
              ),
              
              # Show a plot of the generated distribution
@@ -247,7 +247,7 @@ tabPanel("Footnotes",
            br(),
            
            p(paste("I'd like to thank Michael Galarnyk, who wrote an excellent Medium article
-                   explaing how to access Twitter's API using R.
+                   explaining how to access Twitter's API using R.
                    https://medium.com/@GalarnykMichael/accessing-data-from-twitter-api-using-r-part1-b387a1c7d3e ")),
            
            br(),
