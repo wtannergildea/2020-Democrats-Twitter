@@ -20,6 +20,9 @@ nrc_tweets <- read_rds("nrc_tweets")
 bing_tweets <- read_rds("bing_tweets")
 word_freq <- read_rds("word_frequency")
 
+# For word freq by candidate section
+kamala_words <- read_rds("kamala_words")
+
 summary_table <- read_rds("clean_summary_table") %>% 
   rename("Handle" = "screenName", 
          "# of Tweets in 2019" = "tweet_count", 
@@ -273,8 +276,7 @@ tabPanel("Individual Key Words",
                
                br(),
                
-               # I want to output a graph with the 25 most frequently  used words per candidate, with toggle
-               # function between each candidate possible
+               plotOutput("candidate_words"),
                
                br()
                
@@ -439,13 +441,14 @@ server <- function(input, output) {
    
    output$candidate_words <- renderPlot({
      
-     cleaned_tweet  %>% 
-       filter(screenName == input$candidate) %>% 
-       unnest_tokens(word, text) %>% 
-       anti_join(stop_words) %>% 
-       count(word) %>% 
-       filter(word != "https" & word != "t.co") %>% 
-       ggplot(aes(x = n, y = word)) + geom_col()
+       ggplot(kamala_words, aes(x = reorder(word, n), y = n)) +
+       geom_col() +
+       coord_flip() +
+       labs(title = "Most Frequently Used Words: Kamala Harris") +
+       xlab("Word") +
+       ylab(NULL) +
+       
+       theme_fivethirtyeight()
   
    })
 
