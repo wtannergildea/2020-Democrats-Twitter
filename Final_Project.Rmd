@@ -214,7 +214,29 @@ word_frequency <- tweets %>%
 
 write_rds(word_frequency, "2020-Dems/word_frequency")
 
+
 # Make visualization of top 25 words per candidate
+
+kamala_words <- 
+  tweets %>% 
+  filter(screenName == "KamalaHarris") %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words) %>% 
+  count(word) %>% 
+  filter(word != "https" & word != "t.co") %>% 
+  arrange(desc(n)) %>% 
+  slice(1:25) 
+
+
+ggplot(kamala_words, aes(x = reorder(word, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Most Frequently Used Words") +
+  xlab("Word") +
+  ylab(NULL)
+  
+
+  
 ```
 
 I would like a drop down menu with candidate names, and if selected, a wordcloud of their most frequently used words.

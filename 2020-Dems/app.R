@@ -436,6 +436,18 @@ server <- function(input, output) {
      options = list(dom = 't')
      
    )
+   
+   output$candidate_words <- renderPlot({
+     
+     cleaned_tweet  %>% 
+       filter(screenName == input$candidate) %>% 
+       unnest_tokens(word, text) %>% 
+       anti_join(stop_words) %>% 
+       count(word) %>% 
+       filter(word != "https" & word != "t.co") %>% 
+       ggplot(aes(x = n, y = word)) + geom_col()
+  
+   })
 
 }
 
