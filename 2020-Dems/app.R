@@ -23,6 +23,7 @@ word_freq <- read_rds("word_frequency")
 # For word freq by candidate section
 kamala_words <- read_rds("kamala_words")
 
+
 summary_table <- read_rds("clean_summary_table") %>% 
   rename("Handle" = "screenName", 
          "# of Tweets in 2019" = "tweet_count", 
@@ -440,11 +441,21 @@ server <- function(input, output) {
    )
    
    output$candidate_words <- renderPlot({
+    
+     candidate_words <- 
+       tweets %>% 
+       filter(screenName == input$candidate) %>%
+       unnest_tokens(word, text) %>% 
+       anti_join(stop_words) %>% 
+       count(word) %>% 
+       filter(word != "https" & word != "t.co") %>% 
+       arrange(desc(n)) %>% 
+       slice(1:25) 
      
-       ggplot(kamala_words, aes(x = reorder(word, n), y = n)) +
+       ggplot(candidate_words, aes(x = reorder(word, n), y = n)) +
        geom_col() +
        coord_flip() +
-       labs(title = "Most Frequently Used Words: Kamala Harris") +
+       labs(title = "Most Frequently Used Words") +
        xlab("Word") +
        ylab(NULL) +
        

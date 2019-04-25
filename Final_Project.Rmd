@@ -215,32 +215,21 @@ word_frequency <- tweets %>%
 write_rds(word_frequency, "2020-Dems/word_frequency")
 
 
-# Make visualization of top 25 words per candidate
+# Visualization top 25 words per candidate. This code was used to test the functionality,
+# but the working code is kept in the app.R file. 
 
-kamala_words <- 
-  tweets %>% 
-  filter(screenName == "KamalaHarris") %>% 
-  unnest_tokens(word, text) %>% 
-  anti_join(stop_words) %>% 
-  count(word) %>% 
-  filter(word != "https" & word != "t.co") %>% 
-  arrange(desc(n)) %>% 
-  slice(1:25) 
-
-write_rds(kamala_words, "2020-Dems/kamala_words")
-
-
-# ggplot(kamala_words, aes(x = reorder(word, n), y = n)) +
-#   geom_col() +
-#   coord_flip() +
-#   labs(title = "Most Frequently Used Words: Kamala Harris") +
-#   xlab("Word") +
-#   ylab(NULL) +
+# candidate_words <- 
+#   tweets %>% 
+#   filter(screenName == "KamalaHarris") %>% 
+#   unnest_tokens(word, text) %>% 
+#   anti_join(stop_words) %>% 
+#   count(word) %>% 
+#   filter(word != "https" & word != "t.co") %>% 
+#   arrange(desc(n)) %>% 
+#   slice(1:25) 
 # 
-#   theme_fivethirtyeight()
-  
-# ggsave("kamala_words.png", path ="2020-Dems/kamala_words.png")
-  
+# write_rds(kamala_words, "2020-Dems/kamala_words")
+
 ```
 
 I would like a drop down menu with candidate names, and if selected, a wordcloud of their most frequently used words.
