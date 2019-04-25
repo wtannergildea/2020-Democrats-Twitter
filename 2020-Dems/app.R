@@ -8,6 +8,7 @@ library(shinythemes)
 library(tidytext)
 library(plotly)
 library(DT)
+data("stop_words")
 
 ####################################                 
 # LOAD DATA
@@ -106,6 +107,9 @@ tabPanel("Summary Statistics",
                 "Not all candidates have taken to Twitter with the same frequency as others.
                 Here you can see the candidates' Twitter activity since the beginning of 2019, as visualized
                 by the volume of their tweets over time.",
+                
+                # I want to add another input control that allows the user to change the data range,
+                # in most cases make it smaller. 
                 
                 br(),
                 br(),
@@ -220,13 +224,62 @@ tabPanel("Individual Key Words",
            sidebarLayout(
              sidebarPanel(
                
-               textInput("word", "Please enter your keyword, e.g. healthcare.", "healthcare")
+               textInput("word", "Please enter your keyword, e.g. healthcare.", "healthcare"),
+               
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               
+               selectInput("candidate", 
+                           "Please select a candidate to view.",
+                           c("KamalaHarris",
+                           "amyklobuchar",
+                           "BernieSanders",
+                           "BetoORourke",
+                           "CoryBooker",
+                           "ewarren",
+                           "Hickenlooper",
+                           "JayInslee",
+                           "JoeBiden",
+                           "JulianCastro",
+                           "PeteButtigieg",
+                           "SenGillibrand"))
              ),
              
              # Show a plot of the generated distribution
              mainPanel(
                
-               DTOutput("word_count_table")
+               p(paste("It is also interesting to analyze candidates' language at the individual word
+                       level.")),
+               
+               br(),
+               
+               DTOutput("word_count_table"),
+               
+               br(),
+               br(),
+               
+               p(paste("You can also select a candidate's Twitter handle to visualize which individual
+                       words they use most frequently.")),
+               
+               br(),
+               
+               # I want to output a graph with the 25 most frequently  used words per candidate, with toggle
+               # function between each candidate possible
+               
+               br()
+               
+               # I could also make a visualization of word use between two candidates the user selects,
+               # like Mara did here: https://github.com/batpigandme/tidymueller/
              )
            )
          )),
