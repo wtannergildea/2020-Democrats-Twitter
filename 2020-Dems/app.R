@@ -443,7 +443,7 @@ server <- function(input, output) {
    output$candidate_words <- renderPlot({
     
      candidate_words <- 
-       tweets %>% 
+       cleaned_tweets %>% 
        filter(screenName == input$candidate) %>%
        unnest_tokens(word, text) %>% 
        anti_join(stop_words) %>% 
