@@ -489,6 +489,8 @@ server <- function(input, output) {
        arrange(desc(n)) %>% 
        slice(1:25) # Takes top 25 only
      
+     # Using the data above to create the visualization. The reorder and coord_flip functions are great
+     # in making the bars horizontal, not vertical.
      
        ggplot(candidate_words, aes(x = reorder(word, n), y = n)) +
        geom_col() +
