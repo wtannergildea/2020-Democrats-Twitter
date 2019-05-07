@@ -17,7 +17,7 @@ library(shiny)
 library(shinythemes)
 library(tidytext)
 data("stop_words")
-library(politeness)
+
 ```
 
 ```{r download}
@@ -283,22 +283,3 @@ afinn_tweets <- tweets %>%
 write_rds(afinn_tweets, "2020-Dems/afinn_tweets")
 ```
 
-```{r politeness}
-# I want to try dt's politeness package on the tweets.
-
-cleaned_t <- tweets %>%
-  filter(screenName == "KamalaHarris" | screenName == "PeteButtigieg") %>% 
-  group_by(screenName)
-
-polite_table <- politeness(cleaned_t$text, parser = "none", drop_blank = TRUE)
-# df_politeness_count <- cleaned_t %>%
-#   politeness(cleaned_t$text,
-#                                   parser="none",
-#               metric = "count",
-#                                   drop_blank=FALSE)
-#
-# politenessPlot(df_politeness_count,
-#                split=cleaned_t$condition,
-#                split_levels = c("KamalaHarris","PeteButtigieg"),
-#                split_name = "screenName")
-```

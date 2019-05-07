@@ -178,8 +178,9 @@ tabPanel("Sentiment Analysis",
               
                p(paste("In sentiment analysis using R, there are three main lexicons: AFINN, NRC, and BING.
                        The AFINN lexicon assigns a positivity rating to the text by aggregating the scores of
-                       individual words, which range from -5 (most negative) to +5 (most positive). What outliers
-                       do you notice among the candidates?")),
+                       individual words, which range from -5 (most negative) to +5 (most positive). Some candidates
+                       can have very high positivity ratings but still an overall negative AFINN value, given the magnitude 
+                       of their negativity rating. What outliers do you notice among the candidates?")),
           
                br(),
           
@@ -192,7 +193,8 @@ tabPanel("Sentiment Analysis",
           
               p(paste("The NRC lexicon is interesting because it assigns a specific emotion to each word, in addition
                       to an overall binary value of either positive or negative. These emotions include
-                      anger, anticipation, disgust, fear, joy, sadness, surprise, and trust.")),
+                      anger, anticipation, disgust, fear, joy, sadness, surprise, and trust. You can use the
+                      legend on the right to select for specific emotions and compare the candidates.")),
           
                br(),
                
@@ -202,7 +204,8 @@ tabPanel("Sentiment Analysis",
           
               p(paste("The final standard lexicon, BING, is similar to the NRC method but does not include
               emotions. It focuses simply on applying a binary value of either positive or negative to each
-                      word.")),
+                      tweet, based on the aggregate of each word's rating. You can see the relationship between 
+                      this metric and the overall positivity rating assigned using the AFINN lexicon above.")),
           
                br(),
                
@@ -242,6 +245,14 @@ tabPanel("Individual Key Words",
                br(),
                br(),
                br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
+               br(),
                
                selectInput("candidate", 
                            "Please select a candidate to view.",
@@ -262,9 +273,13 @@ tabPanel("Individual Key Words",
              # Show a plot of the generated distribution
              mainPanel(
                
-               p(paste("It is also interesting to analyze candidates' language at the individual word
-                       level.")),
+               p(paste("Finally, it is also interesting to analyze candidates' language at the individual word
+                       level. Which candidates use which what words, and how frequently?")),
                
+               br(),
+               
+               p(paste("Using the input box to the left, you can search each candidate's account for individual words.
+                       Try some yourself - what about 'Trump', 'Mueller', 'healthcare', or 'climate'?")),
                br(),
                
                DTOutput("word_count_table"),
@@ -272,8 +287,9 @@ tabPanel("Individual Key Words",
                br(),
                br(),
                
-               p(paste("You can also select a candidate's Twitter handle to visualize which individual
-                       words they use most frequently.")),
+               p(paste("In addition to looking at individual key words, you can also select a candidate's Twitter 
+                      handle to visualize which individual words they use most frequently. Use the drop-down box on the left
+                      to pick a candidate.")),
                
                br(),
                
@@ -303,8 +319,9 @@ tabPanel("Footnotes",
            br(),
            
            p(paste("I'd like to thank Michael Galarnyk, who wrote an excellent Medium article
-                   explaining how to access Twitter's API using R.
-                   https://medium.com/@GalarnykMichael/accessing-data-from-twitter-api-using-r-part1-b387a1c7d3e ")),
+                   explaining how to access Twitter's API using R.")),
+
+          p(paste("Check it out here: https://medium.com/@GalarnykMichael/accessing-data-from-twitter-api-using-r-part1-b387a1c7d3e")),
            
            br(),
            
@@ -392,10 +409,12 @@ server <- function(input, output) {
               geom_bar(stat = "identity") +
        labs(title = "Average Positivity of Candidates' Tweets",
             subtitle = "Per Afinn",
-            y = "Average AFINN Positivity Rating") +
+            y = "Average AFINN Positivity Rating", 
+            fill = "Select Candidate") +
        theme(axis.title.x=element_blank(),
-             axis.text.x=element_blank(),
-             axis.ticks.x=element_blank())
+             # axis.text.x=element_blank(),
+             axis.text.x = element_text(angle = 60, hjust = 1))
+             # axis.ticks.x=element_blank())
      )
      
      
@@ -404,13 +423,15 @@ server <- function(input, output) {
     output$nrc <- renderPlotly({
       
      ggplot(nrc_tweets, aes(x = screenName, y = n, fill = sentiment)) +
-       geom_bar(stat = "identity") +
+       geom_bar(position = "dodge", stat = "identity") +
        labs(title = "Emotions Conveyed by Candidates' Tweets",
             subtitle = "Per NRC",
-            y = "Count") +
+            y = "Count",
+            fill = "Sentiment") +
        theme(axis.title.x=element_blank(),
-             axis.text.x=element_blank(),
-             axis.ticks.x=element_blank())
+             # axis.text.x=element_blank(),
+             axis.text.x = element_text(angle = 60, hjust = 1))
+             # axis.ticks.x=element_blank())
      })
      
    # BING OUTPUT
@@ -418,13 +439,15 @@ server <- function(input, output) {
    output$bing <- renderPlotly({
 
      ggplot(bing_tweets, aes(x = screenName, y = n, fill = sentiment)) +
-       geom_bar(stat = "identity") +
+       geom_bar(position = "dodge", stat = "identity") +
        labs(title = "Number of Positive and Negative Tweets",
             subtitle = "Per BING",
-            y = "Count") +
+            y = "Count",
+            fill = "Sentiment") +
        theme(axis.title.x=element_blank(),
-             axis.text.x=element_blank(),
-             axis.ticks.x=element_blank())
+             # axis.text.x=element_blank(),
+             axis.text.x = element_text(angle = 60, hjust = 1))
+             # axis.ticks.x=element_blank())
     })
 
    ####################################
@@ -455,7 +478,7 @@ server <- function(input, output) {
        ggplot(candidate_words, aes(x = reorder(word, n), y = n)) +
        geom_col() +
        coord_flip() +
-       labs(title = "Most Frequently Used Words") +
+       labs(title = "Count of Most Frequently Used Words") +
        xlab("Word") +
        ylab(NULL) +
        
