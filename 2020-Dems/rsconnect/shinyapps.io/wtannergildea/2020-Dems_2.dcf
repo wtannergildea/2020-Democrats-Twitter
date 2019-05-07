@@ -5,9 +5,9 @@ account: wtannergildea
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 877839
-bundleId: 2045001
+bundleId: 2066932
 url: https://wtannergildea.shinyapps.io/2020-Dems_2/
-when: 1556478853.14617
+when: 1557244256.99115
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: fav_average
