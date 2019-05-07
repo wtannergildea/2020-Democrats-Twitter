@@ -5,8 +5,19 @@ date: "4/2/2019"
 output: html_document
 ---
 
+# The Data
+
+My plan is to conduct a number of analyses (text sentiment, basic stats, etc) on the Twitter data of current 2020 Democratic primary challengers. To make the project more managable, I will limit my timeline to start at the beginning of 2019.
+
+I created a developer account on Twitter and was able to access its API. Using the twitteR package, I am able to download the text of the tweets from each candidate's personal account, in addition to other data such as their favorite and retweet activity. The data is relatively clean and tidy as is, although I filtered to remove retweets and some other information. In the future, I may include lat/long data to analyze other geographic trends, or see who they interact with the most on Twitter.
+
+Here is the instructive guide I referenced for accessing, downloading, and manipulating the Twitter data using the twitteR package: https://medium.com/the-artificial-impostor/analyzing-tweets-with-r-92ff2ef990c6
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Load all necessary packages.
+
 library(twitteR)
 library(dplyr)
 library(ggplot2)
@@ -16,19 +27,23 @@ library(ggthemes)
 library(shiny)
 library(shinythemes)
 library(tidytext)
-data("stop_words")
 
+# The stop words data is necessary later for sentiment analysis.
+data("stop_words")
 ```
 
 ```{r download}
 
-# Access keys from developer app. 
+# Access keys from developer app for Twitter's API. I used my own personal account to become a
+# developer - nothing much to it.
 consumer_key <- "JiBgIY3c2oSYaluzC9901ZpGH"
 consumer_secret <- "T0cbKHAWJe6NW3e24F8KvvFeV6lv54aeNmavAGFyL9qHVFm7tL"
 access_token <- "1091061777935355905-pd7WDjnoiOSxcEKMgxyucfOLHtOhk4"
 access_secret <- "nLgDpWG4FhhbAvTGLeEET1nXkAkbVmMw08uZEmin54sRS"
 
-# This section will actually conduct the download.
+# This section will actually conduct the download, using the keys above. The maximum number
+# of tweets you can pull is limited at 3200. Also, I set the includeRts function to False in order
+# to exclude retweets from each candidate.
 
 setup_twitter_oauth(
     consumer_key, consumer_secret, access_token, access_secret)
@@ -50,7 +65,8 @@ biden <- userTimeline("JoeBiden", n = 3200, includeRts=F)
 
 ```{r clean}
 
-# To change from a list into a dataframe.
+# This is necessary to change the imported twitter data from a list into a dataframe.
+
 df.harris <- twListToDF(harris)
 df.sanders <- twListToDF(sanders)
 df.booker <- twListToDF(booker)
@@ -67,17 +83,15 @@ df.biden <- twListToDF(biden)
 
 ```{r}
 
-# This will select only the metrics we care about in 2019, in addition to ignoring retweets.
+# Now I combine the indiviudal data frames from each candidate, and then apply filters.
+# This will select only the metrics we care about in 2019, in addition to ignoring retweets (redundant
+# given the False setting above, but useful code architecture if future changes desired.
 
 tweets <- bind_rows(
   df.harris %>% filter(isRetweet==F) %>%
   select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019),
-    
-# For politeness test
-  
-    # mutate(condition = 0),
 
 df.sanders %>% filter(isRetweet==F) %>%
     select(
@@ -93,11 +107,7 @@ df.buttigieg %>% filter(isRetweet==F) %>%
     select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019),  
-  
-# For politeness test
-  
-  # mutate(condition = 1),
-  
+
 df.castro %>% filter(isRetweet==F) %>%
     select(
       text, screenName, created, retweetCount, favoriteCount) %>% 
@@ -138,34 +148,31 @@ df.biden %>% filter(isRetweet==F) %>%
       text, screenName, created, retweetCount, favoriteCount) %>% 
   filter(year(created) == 2019))
 
+# Once combined and filtered, I export the data frame as an rds file. This is what the shiny app 
+# will import and use to construct its visualizations.
+
 write_rds(tweets, "2020-Dems/cleaned_tweets")
 
 ```
 
-```{r}
 
-```
-# The Data
 
-My plan is to conduct a number of analyses (text sentiment, basic stats, etc) on the Twitter data of current 2020 Democratic primary challengers. To make the project more managable, I will limit my timeline to start at the beginning of 2019.
 
-I created a developer account on Twitter and was able to access its API. Using the twitteR package, I am able to download the text of the tweets from each candidate's personal account, in addition to other data such as their favorite and retweet activity. The data is relatively clean and tidy as is, although I filtered to remove retweets and some other information. In the future, I may include lat/long data to analyze other geographic trends, or see who they interact with the most on Twitter.
+```{r first}
 
-Here is the instructive guide I referenced for accessing, downloading, and manipulating the Twitter data using the twitteR package: https://medium.com/the-artificial-impostor/analyzing-tweets-with-r-92ff2ef990c6
+# With the data all set, I now begin constructing a number of visualizations that will be 
+# used in the shiny app. For some, it's easiest to create them here and then load them in the app.
+# For others, I found it better to create them using the loaded data within the shiny app itself.
 
-# Summary Stats
-
-A first visualization is each candidate's tweet activity over time. Specifically, I visualize tweet frequency
-since January. I also want to create a table of summary stats for each candidate, including total number of tweets, average length of tweets in characters, average number of favorites, and average number of retweets.
-
-```{r}
-
-# Visualization of tweet activity 
+# The first visualization I make is a simple histogram of the frequency of each candidate's tweeting,
+# faceted by each individual candidate.
 
 activity_hist <- ggplot(tweets, aes(x = created, fill = screenName)) +
   geom_histogram(
     position = "identity", bins = 50, show.legend = FALSE) +
   facet_wrap(~ screenName, nrow = 2) +
+  
+# Standard labels and titles, including the FiveThirtyEight theme.
   
   labs(title = "2020 Democratic Challengers' Tweet Activity",
        subtitle = "Frequency of Tweets in 2019",
@@ -175,10 +182,9 @@ activity_hist <- ggplot(tweets, aes(x = created, fill = screenName)) +
   theme_fivethirtyeight()
 ```
 
-```{r}
-# SUMMARY STATS
-
-# summary table of mean tweet count, favs, retweets, lengths, etc
+```{r summary}
+# I also wanted to create a basic summary table of twitter metrics, including length of tweet,
+# number of tweets, and average number of favorites and retweets.
 
 summary_table <- tweets %>% 
   group_by(screenName) %>% 
@@ -189,34 +195,44 @@ summary_table <- tweets %>%
   mutate(fav_average = round(mean(favoriteCount)), digits = 0) %>% 
   mutate(rt_average = round(mean(retweetCount)), digits = 0) 
 
+# With the table created, I need to clean it a bit further, selecting for candidate handle and
+# the new variables I created above. 
+
 clean_summary_table <- summary_table %>% 
   select(screenName, tweet_count, mean_tweet_length, fav_average, rt_average) %>% 
   distinct()
 
+# With the table clean, I similarly export it as an rds for later use within the app.
+
 write_rds(clean_summary_table, "2020-Dems/clean_summary_table")
 
-  
 ```
 
-I also want to create a tab that looks at specific word frequencies, with a search box and a bar chart with each candidate's total.
 
 ```{r frequencies}
 
 # Word Use Frequency Table
 
+# I also want to create a tab that looks at specific word frequencies, with a search box and a bar chart with each candidate's total.
+
+# To see how frequently a candidate uses particular words, the unnest function is very helpful in 
+# splitting each tweet apart at the individual word level. 
+
 word_frequency <- tweets %>% 
   unnest_tokens(word, text) %>% 
   group_by(screenName) %>% 
-  filter(word != "https" & word != "t.co" & word != "amp") %>% 
+  filter(word != "https" & word != "t.co" & word != "amp") %>% # Certain filler/ useless words appear
   count(word) %>% 
   select(screenName, word, n ) %>% 
   rename("User" = "screenName", "Word" = "word", "Count" = "n")
 
+# Again, write this out for future use.
+
 write_rds(word_frequency, "2020-Dems/word_frequency")
 
 
-# Visualization top 25 words per candidate. This code was used to test the functionality,
-# but the working code is kept in the app.R file. 
+# This is the code for a visualization top 25 words per candidate. This code was used to test the 
+# functionality, but the working code is kept in the app.R file. I found this worked better.
 
 # candidate_words <- 
 #   tweets %>% 
@@ -232,25 +248,23 @@ write_rds(word_frequency, "2020-Dems/word_frequency")
 
 ```
 
-I would like a drop down menu with candidate names, and if selected, a wordcloud of their most frequently used words.
-```{r}
 
-
-```
-
-I also want a drop down menu of key issue words, and once selected, a visualization of how each candidate has used that word. 
-
-List of keywords: climate, health, healthcare, trump, iowa, gun, abortion, religion, rich, poor, war, justice, hope, change, others?
-```{r}
-
-```
-
+```{r sentiment}
 
 # Sentiment Analysis
 
-One tab will be dedicated to sentiment analysis. Again, this will be used to differentiate candidates based on positivity, negativity, and possibly other factors.
+# One tab will be dedicated to sentiment analysis. Again, this will be used to differentiate candidates 
+# based on positivity, negativity, and possibly other emotions such as trust or fear.
 
-```{r}
+# Sentiment analysis can be done using many different lexicons. AFINN, Bing, and NRC are three
+# standard lexicons included in the tidytext package. A fuller description of these lexicons is included
+# in my shiny app.
+
+# To do the analysis, you unest the words like we did before. Then you make sure to exclude filler
+# words, known as stop words. This is done using the anti_join function - to remove any matches
+# present between the stop words data and the tweets.
+
+# Then, you look for matches between the words and each lexicon. I do this for Bing, NRC, and AFINN # below.
 
 # bing and nrc lexicons are two different baskets of words for positivity/negativity 
 bing_tweets <- tweets %>%
