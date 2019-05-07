@@ -295,5 +295,7 @@ afinn_tweets <- tweets %>%
   summarize(average_positivity = mean(score))
 
 write_rds(afinn_tweets, "2020-Dems/afinn_tweets")
+
+# That's it!
 ```
 
