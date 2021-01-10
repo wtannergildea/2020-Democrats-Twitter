@@ -337,13 +337,10 @@ tabPanel("Footnotes",
            
            br(),
            
-           p(paste("I'd like to thank my friend Max Weiss, whose analysis of Trump's tweets was instrumental in developing
+           p(paste("I'd also like to thank my friend Max Weiss, whose analysis of Trump's tweets was instrumental in developing
                   my own project and codebase.")),
            
-           br(),
-           
-           p(paste("And finally, I give my full gratitude to David Kane (Preceptor), the head of Gov:1005 (Data) at Harvard and the
-                  rope that protected me from the sirens."))
+           br()
          )))
 
 ###################################
